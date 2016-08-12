@@ -1,0 +1,84 @@
+<html>
+<head>
+	<title>React Stuff</title>
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/react/0.13.0/react.min.js" ></script>
+	<script src="https://npmcdn.com/babel-core@5.8.38/browser.min.js"></script>
+	<script src="https://code.jquery.com/jquery-3.1.0.js"   integrity="sha256-slogkvB1K3VOkzAI8QITxV3VzpOnkeNVsKvtkYLMjfk="   crossorigin="anonymous"></script>
+</head>
+<body>
+	<div id="app">
+		<div id="react-container">
+		</div>
+	</div>
+</body>
+</html>
+
+
+<script type="text/babel">
+	class Hello extends React.Component {
+		constructor(props){
+			super(props);
+			this.state = {height: 200, color: "red"}
+		}
+		render() {
+
+			var {name, age, image} = this.props;
+			var{height, color, sunrise} = this.state;
+			var profileStyle = {
+				backgroundColor: color,
+				WebkitTransition: 'all'
+			}
+			
+			setTimeout(() => {
+				this.setState({color: "blue"})
+			}, 1000)
+			return( <div className="profile" style={profileStyle}>
+								<h1>my name is: {name}</h1>
+								<h2>I am {age}</h2>
+								<h2>My Fav color is: {color}</h2>
+								<h3>sunrise was: {sunrise}</h3>
+								<button onClick={this.zoomIn.bind(this)}> Zoom In </button>
+								<button onClick={this.zoomOut.bind(this)}> Zoom Out </button>
+								<button onClick={this.getWeather.bind(this)}> get Weather </button>
+								<br/>
+								<img src={image} height={height}/>
+							</div>
+						);
+		}
+		zoomIn(){
+			this.setState({height: this.state.height + 80});
+		}
+		zoomOut(){
+			this.setState({height: this.state.height - 80});
+		}
+		getWeather() {
+				$.ajax({
+				  url: 'https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20weather.forecast%20where%20woeid%20in%20(select%20woeid%20from%20geo.places(1)%20where%20text%3D%22nome%2C%20ak%22)&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys',
+				  dataType: 'json',
+				  type: 'GET',
+				  cache: false,
+				  success: function(data) {
+				    this.setState({data: data, sunrise: data.query.results.channel.astronomy.sunrise});
+				    console.log(data)
+				  }.bind(this),
+				  error: function(xhr, status, err) {
+				    console.error(this.props.url, status, err.toString());
+				  }.bind(this)
+				});
+			}
+	}
+
+
+	React.render(<Hello name="Alex" age={32} image="http://fillmurray.com/200/300"/>, document.getElementById('react-container') );
+</script>
+
+<style type="text/css" media="screen">
+.profile {
+    width: 500px;
+    padding: 20px;
+    text-align: center;
+    margin: 0 auto;
+    background-color: #f7f7f7;
+    box-shadow: 0px 0px 2px 0px dimgrey;
+}
+</style>
